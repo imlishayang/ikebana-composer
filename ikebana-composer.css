@@ -126,12 +126,9 @@ h2 {
   pointer-events: none;
 }
 
-.card b {
-  display: none;
-}
-
+.card b,
 .card small {
-  color: var(--mut);
+  display: none;
 }
 
 button {

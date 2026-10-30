@@ -1,87 +1,47 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ikebana Composer</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&display=swap">
-<link rel="stylesheet" href="ikebana-composer.css">
-</head><body>
-<header><h1>Ikebana composer</h1><p>Choose a vessel, set one strong line, then let the space speak.</p></header>
-<div class="app">
-<aside>
-<h2>Vessel</h2><div class="vs" id="vs"></div>
-<h2>Stems</h2><div class="grid" id="lib"></div>
-</aside>
-<main>
-<div class="tb">
-<button data-a="undo">Undo</button><button data-a="color">Change color</button><button data-a="big">Larger</button><button data-a="small">Smaller</button><button data-a="fwd">Bring forward</button><button data-a="back">Send back</button><button data-a="dup">Duplicate</button><button data-a="del">Remove</button><button data-a="clear">Clear all</button>
-</div>
-<svg id="cv" viewBox="0 0 600 700" role="img" aria-label="Arrangement canvas"><rect width="600" height="700" style="fill:var(--stage)"/><g id="lay"></g></svg>
-<p class="hint">Drag a stem onto the canvas, or tap it to add. Drag a flower to aim it, and drag the filled dot to bend the stem.</p>
-</main></div>
-<script>
-const $=s=>document.querySelector(s),cl=(v,a,b)=>Math.min(b,Math.max(a,v));
-const P=(b,c,t,u)=>[(1-u)*(1-u)*b[0]+2*(1-u)*u*c[0]+u*u*t[0],(1-u)*(1-u)*b[1]+2*(1-u)*u*c[1]+u*u*t[1]];
-const ang=(b,c,t,u)=>Math.atan2(2*(1-u)*(c[1]-b[1])+2*u*(t[1]-c[1]),2*(1-u)*(c[0]-b[0])+2*u*(t[0]-c[0]))*180/Math.PI;
-const leaf=(b,c,t,u,side,s,col)=>{const[x,y]=P(b,c,t,u);return `<ellipse rx="${13*s}" ry="${5*s}" transform="translate(${x} ${y}) rotate(${ang(b,c,t,u)+side*50}) translate(${11*s} 0)" fill="${col}"/>`};
-const T={
-ranunculus:{n:'Ranunculus',r:'Focal',p:['#f08a2e','#f1e9a8','#e8d6e8','#c7364f'],st:'#6f9a52',w:3.5,h:c=>`<g transform="translate(0,-22)"><circle r="25" fill="${c}"/>${[19,14,9,5].map(r=>`<circle r="${r}" fill="${c}" stroke="#0003" stroke-width="1.3"/>`).join('')}</g>`},
-allium:{n:'Allium',r:'Focal',p:['#b49be0','#e0a7c9','#efece4','#8f6bc9'],st:'#7ca05a',w:3,h:c=>[...Array(64)].map((_,i)=>{const r=Math.sqrt((i+.5)/64)*27,a=i*2.39996;return `<circle cx="${(r*Math.cos(a)).toFixed(1)}" cy="${(r*Math.sin(a)-27).toFixed(1)}" r="3.6" fill="${c}"/>`}).join('')},
-anthurium:{n:'Anthurium',r:'Focal',p:['#d9531e','#c2263a','#f3ede0','#e58aa3'],st:'#6f9a52',w:3.5,h:c=>`<path d="M0 2C-36-6-40-46-5-58Q0-60 5-58C40-46 36-6 0 2Z" fill="${c}" stroke="#0003"/><path d="M0-8Q5-26 10-42" stroke="#e8e39a" stroke-width="5" stroke-linecap="round" fill="none"/>`},
-amaranthus:{n:'Amaranthus',r:'Trailing',p:['#a3205a','#7a2a6e','#b8c16a','#d9674a'],beads:1},
-hawthorn:{n:'Hawthorn',r:'Branch',p:['#e98fb0','#f2c4d0','#f6efe9','#d9a5d8'],st:'#7a5a45',w:2.5,x:(b,c,t,k,s)=>[.2,.38,.52].map((u,i)=>leaf(b,c,t,u,i%2?1:-1,s*.8,'#7ba45a')).join('')+[.45,.58,.7,.82,.93,1].map(u=>{const[x,y]=P(b,c,t,u);return `<g transform="translate(${x} ${y}) scale(${s})"><circle r="6" fill="${k}"/><circle cx="6" cy="-4" r="4.5" fill="${k}"/><circle cx="-5" cy="-3" r="4" fill="${k}" opacity=".7"/></g>`}).join('')},
-vine:{n:'Pea vine',r:'Line',p:['#7ba45a','#5f8f4c','#9bb56a'],st:'#6a9a4a',w:2,x:(b,c,t,k,s)=>[.2,.35,.5,.65,.8,.95].map((u,i)=>leaf(b,c,t,u,i%2?1:-1,s*.9,k)).join('')},
-scape:{n:'Garlic scape',r:'Line',p:['#cfd88a','#e9e4c2','#b6c870'],st:'#7fa650',w:3,h:c=>`<ellipse cy="-12" rx="5.5" ry="13" fill="${c}"/><path d="M0 0L0-24" stroke="#0002" fill="none"/>`}};
-const V=[
-{n:'Wide bowl',mw:110,my:560,c:'#d8b998',d:c=>`<path d="M160 560Q175 625 255 645H345Q425 625 440 560Z" fill="${c}"/><path d="M255 645H345L335 660H265Z" fill="${c}"/><ellipse cx="300" cy="560" rx="140" ry="10" fill="${c}"/><ellipse cx="300" cy="561" rx="128" ry="6" fill="#0004"/>`},
-{n:'Tall cylinder',mw:32,my:560,c:'#8fa88e',d:c=>`<rect x="255" y="560" width="90" height="100" rx="8" fill="${c}"/><rect x="255" y="560" width="24" height="100" fill="#fff" opacity=".14"/><ellipse cx="300" cy="560" rx="45" ry="7" fill="${c}"/><ellipse cx="300" cy="561" rx="38" ry="4" fill="#0004"/>`},
-{n:'Low dish',mw:120,my:605,c:'#b9856a',d:c=>`<path d="M140 605Q150 645 220 655H380Q450 645 460 605Z" fill="${c}"/><ellipse cx="300" cy="605" rx="160" ry="9" fill="${c}"/><ellipse cx="300" cy="606" rx="148" ry="5" fill="#0004"/>`}];
-function it(o){const t=T[o.t],{b,c,p,s}=o,k=t.p[o.k%t.p.length],d=`M${b} Q${c} ${p}`;
-let g=`<g data-id="${o.id}"><path d="${d}" stroke="transparent" stroke-width="24" fill="none"/>`;
-if(t.beads)g+=`<path d="${d}" stroke="${k}" stroke-width="${9*s}" stroke-dasharray="0 ${7*s}" stroke-linecap="round" fill="none"/><path d="${d}" stroke="${k}" stroke-width="1.6" opacity=".7" fill="none"/>`;
-else g+=`<path d="${d}" stroke="${t.st}" stroke-width="${t.w}" stroke-linecap="round" fill="none"/>`;
-if(t.x)g+=t.x(b,c,p,k,s);
-if(t.h)g+=`<g transform="translate(${p}) rotate(${Math.atan2(p[1]-c[1],p[0]-c[0])*180/Math.PI+90}) scale(${s})">${t.h(k)}</g>`;
-return g+'</g>'}
-let items=[],sel=null,vi=0,uid=0,hist=[],drag=null,moved=0;
-const cur=()=>items.find(o=>o.id===sel),svg=$('#cv');
-const snap=()=>{hist.push(JSON.stringify({items,vi,uid}));if(hist.length>60)hist.shift()};
-const save=()=>{try{localStorage.setItem('ikebana-v1',JSON.stringify({items,vi,uid}))}catch(e){}};
-function draw(){const v=V[vi],o=cur();
-$('#lay').innerHTML=`<rect x="90" y="660" width="420" height="24" rx="3" style="fill:var(--plinth)"/>`+v.d(v.c)+items.map(it).join('')+(o?`<path class="gl" d="M${o.b}L${o.c}L${o.p}"/><circle class="hc" data-h="c" cx="${o.c[0]}" cy="${o.c[1]}" r="8"/><circle class="hd" data-h="p" cx="${o.p[0]}" cy="${o.p[1]}" r="10"/>`:'');
-document.querySelectorAll('[data-a]').forEach(b=>{const a=b.dataset.a;b.disabled=a==='undo'?!hist.length:a==='clear'?!items.length:!o});
-document.querySelectorAll('#vs button').forEach((b,i)=>b.classList.toggle('on',i===vi))}
-function add(t,x,y){snap();const v=V[vi],bx=300+cl((x-300)*.25,-v.mw,v.mw),b=[bx,v.my+4],p=[cl(x,10,590),cl(y,20,640)],dx=p[0]-b[0],dy=p[1]-b[1],L=Math.hypot(dx,dy)||1,f=(Math.random()<.5?-1:1)*L*.2;
-items.push({id:++uid,t,b,p,c:[(b[0]+p[0])/2-dy/L*f,(b[1]+p[1])/2+dx/L*f],s:1,k:0});sel=uid;draw();save()}
-const pt=e=>{const q=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse());return[q.x,q.y]};
-svg.onpointerdown=e=>{const h=e.target.dataset&&e.target.dataset.h,g=e.target.closest('[data-id]');
-if(h)drag=h;else if(g){sel=+g.dataset.id;drag='p'}else sel=null;
-if(drag)svg.setPointerCapture(e.pointerId);moved=0;draw()};
-svg.onpointermove=e=>{const o=cur();if(!drag||!o)return;if(!moved){snap();moved=1}const[x,y]=pt(e);if(drag==='p')o.p=[cl(x,10,590),cl(y,20,640)];else o.c=[x,y];draw()};
-svg.onpointerup=svg.onpointercancel=()=>{if(drag&&moved)save();drag=null;moved=0};
-svg.ondragover=e=>e.preventDefault();
-svg.ondrop=e=>{e.preventDefault();const t=e.dataTransfer.getData('text/plain');if(T[t]){const[x,y]=pt(e);add(t,x,y)}};
-$('#vs').innerHTML=V.map((v,i)=>`<button data-v="${i}"><i style="background:${v.c}"></i>${v.n}</button>`).join('');
-$('#vs').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;snap();vi=+b.dataset.v;const v=V[vi];items.forEach(o=>{o.b=[300+cl(o.b[0]-300,-v.mw,v.mw),v.my+4]});draw();save()};
-$('#lib').innerHTML=Object.keys(T).map(t=>`<div class="card" draggable="true" tabindex="0" data-t="${t}"><svg viewBox="-50 -100 100 125">${it({id:0,t,b:[0,18],c:[-12,-28],p:[6,-62],s:.7,k:0})}</svg><b>${T[t].n}</b><small>${T[t].r}</small></div>`).join('');
-const lib=$('#lib');
-lib.ondragstart=e=>{const c=e.target.closest('[data-t]');if(c)e.dataTransfer.setData('text/plain',c.dataset.t)};
-const addRand=c=>c&&add(c.dataset.t,300+(Math.random()-.5)*280,170+Math.random()*200);
-lib.onclick=e=>addRand(e.target.closest('[data-t]'));
-lib.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();addRand(e.target.closest('[data-t]'))}};
-document.querySelector('.tb').onclick=e=>{const a=e.target.dataset.a,o=cur();if(!a)return;
-if(a==='undo'){const h=hist.pop();if(h){({items,vi,uid}=JSON.parse(h));sel=null}}
-else{snap();
-if(a==='clear'){items=[];sel=null}
-else if(o){const i=items.indexOf(o);
-if(a==='del'){items.splice(i,1);sel=null}
-if(a==='color')o.k++;
-if(a==='big')o.s=Math.min(2.2,o.s*1.15);
-if(a==='small')o.s=Math.max(.5,o.s/1.15);
-if(a==='fwd'&&i<items.length-1)[items[i],items[i+1]]=[items[i+1],items[i]];
-if(a==='back'&&i>0)[items[i],items[i-1]]=[items[i-1],items[i]];
-if(a==='dup'){const n=JSON.parse(JSON.stringify(o));n.id=++uid;['b','c','p'].forEach(k=>n[k][0]=cl(n[k][0]+16,5,595));items.push(n);sel=n.id}}}
-draw();save()};
-try{const s=JSON.parse(localStorage.getItem('ikebana-v1')||'null');if(s&&Array.isArray(s.items)){items=s.items;vi=s.vi||0;uid=s.uid||0}}catch(e){}
-if(!items.length){[['ranunculus',428,150],['allium',330,250],['hawthorn',130,215]].forEach(([t,x,y])=>add(t,x,y));hist=[];sel=null}
-draw();
-</script></body></html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Ikebana Composer</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&display=swap">
+    <link rel="stylesheet" href="ikebana-composer.css">
+    <script src="ikebana-composer.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Ikebana composer</h1>
+      <p>Choose a vessel, set one strong line, then let the space speak.</p>
+    </header>
+
+    <div class="app">
+      <aside>
+        <h2>Vessel</h2>
+        <div class="vs" id="vs"></div>
+
+        <h2>Stems</h2>
+        <div class="grid" id="lib"></div>
+      </aside>
+
+      <main>
+        <div class="tb">
+          <button data-a="undo">Undo</button>
+          <button data-a="color">Change color</button>
+          <button data-a="big">Larger</button>
+          <button data-a="small">Smaller</button>
+          <button data-a="fwd">Bring forward</button>
+          <button data-a="back">Send back</button>
+          <button data-a="dup">Duplicate</button>
+          <button data-a="del">Remove</button>
+          <button data-a="clear">Clear all</button>
+        </div>
+
+        <svg id="cv" viewBox="0 0 600 700" role="img" aria-label="Arrangement canvas">
+          <rect width="600" height="700" style="fill: var(--stage)"></rect>
+          <g id="lay"></g>
+        </svg>
+        <p class="hint">Drag a stem onto the canvas, or tap it to add. Drag a flower to aim it, and drag the filled dot to bend the stem.</p>
+      </main>
+    </div>
+  </body>
+</html>

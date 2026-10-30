@@ -1,32 +1,229 @@
-:root{--bg:#e8ebe8;--panel:#f3f5f2;--ink:#232625;--mut:#6f7673;--line:#d3d8d4;--acc:#6b2a5c;--stage:#dfe4e1;--plinth:#c4cbc6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151817;--panel:#1d2120;--ink:#e9ede9;--mut:#8f9893;--line:#2f3532;--acc:#d08bc0;--stage:#252a28;--plinth:#343b38}}
-:root[data-theme="dark"]{--bg:#151817;--panel:#1d2120;--ink:#e9ede9;--mut:#8f9893;--line:#2f3532;--acc:#d08bc0;--stage:#252a28;--plinth:#343b38}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,"Helvetica Neue",Arial,sans-serif}
-header{padding:20px 24px 4px}
-h1{font:600 28px/1.1 "Shippori Mincho",Georgia,serif;margin:0}
-header p{margin:6px 0 0;color:var(--mut);font-family:"Shippori Mincho",Georgia,serif}
-.app{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;padding:16px 24px 24px;max-width:1100px;margin:0 auto}
-aside{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;align-self:start}
-h2{font:600 15px "Shippori Mincho",Georgia,serif;margin:0 0 8px}
-.vs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-.vs button{display:flex;align-items:center;gap:6px;padding:6px 10px}
-.vs i{width:12px;height:12px;border-radius:50%;display:inline-block}
-.vs button.on{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.card{border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:4px 4px 8px;text-align:center;cursor:grab;user-select:none;-webkit-user-select:none}
-.card:hover{border-color:var(--acc)}
-.card svg{width:100%;height:92px;pointer-events:none}
-.card b{display:block;font-weight:500}
-.card small{color:var(--mut)}
-button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
-button:disabled{opacity:.4;cursor:default}
-button:focus-visible,.card:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.tb{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-#cv{width:100%;height:auto;max-height:78vh;display:block;border-radius:10px;touch-action:none;border:1px solid var(--line)}
-.hint{color:var(--mut);margin:8px 2px 0}
-.hd{fill:#fff;stroke:var(--acc);stroke-width:2.5;cursor:grab}
-.hc{fill:var(--acc);cursor:grab}
-.gl{stroke:var(--acc);stroke-dasharray:3 4;fill:none;opacity:.7}
-@media(max-width:760px){.app{grid-template-columns:1fr;padding:12px}header{padding:16px 12px 0}.grid{grid-template-columns:repeat(4,minmax(96px,1fr));overflow-x:auto}}
+:root {
+  --bg: #e8ebe8;
+  --panel: #f3f5f2;
+  --ink: #232625;
+  --mut: #6f7673;
+  --line: #d3d8d4;
+  --acc: #6b2a5c;
+  --stage: #dfe4e1;
+  --plinth: #c4cbc6;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #151817;
+    --panel: #1d2120;
+    --ink: #e9ede9;
+    --mut: #8f9893;
+    --line: #2f3532;
+    --acc: #d08bc0;
+    --stage: #252a28;
+    --plinth: #343b38;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #151817;
+  --panel: #1d2120;
+  --ink: #e9ede9;
+  --mut: #8f9893;
+  --line: #2f3532;
+  --acc: #d08bc0;
+  --stage: #252a28;
+  --plinth: #343b38;
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.45 -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+header {
+  padding: 20px 24px 4px;
+}
+
+h1 {
+  font: 600 28px/1.1 "Shippori Mincho", Georgia, serif;
+  margin: 0;
+}
+
+header p {
+  margin: 6px 0 0;
+  color: var(--mut);
+  font-family: "Shippori Mincho", Georgia, serif;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px 24px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+aside {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  align-self: start;
+}
+
+h2 {
+  font: 600 15px "Shippori Mincho", Georgia, serif;
+  margin: 0 0 8px;
+}
+
+.vs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.vs button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+}
+
+.vs i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.vs button.on {
+  border-color: var(--acc);
+  box-shadow: inset 0 0 0 1px var(--acc);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  padding: 4px 4px 8px;
+  text-align: center;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.card:hover {
+  border-color: var(--acc);
+}
+
+.card svg {
+  width: 100%;
+  height: 92px;
+  pointer-events: none;
+}
+
+.card b {
+  display: block;
+  font-weight: 500;
+}
+
+.card small {
+  color: var(--mut);
+}
+
+button {
+  font: inherit;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+button:focus-visible,
+.card:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+.tb {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+#cv {
+  width: 100%;
+  height: auto;
+  max-height: 78vh;
+  display: block;
+  border-radius: 10px;
+  touch-action: none;
+  border: 1px solid var(--line);
+}
+
+.hint {
+  color: var(--mut);
+  margin: 8px 2px 0;
+}
+
+.hd {
+  fill: #fff;
+  stroke: var(--acc);
+  stroke-width: 2.5;
+  cursor: grab;
+}
+
+.hc {
+  fill: var(--acc);
+  cursor: grab;
+}
+
+.gl {
+  stroke: var(--acc);
+  stroke-dasharray: 3 4;
+  fill: none;
+  opacity: 0.7;
+}
+
+@media (max-width: 760px) {
+  .app {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  header {
+    padding: 16px 12px 0;
+  }
+
+  .grid {
+    grid-template-columns: repeat(4, minmax(96px, 1fr));
+    overflow-x: auto;
+  }
+}

@@ -13,6 +13,7 @@
 }
 
 html {
+  min-height: 100%;
   scroll-padding-top: env(safe-area-inset-top, 0px);
 }
 
@@ -21,6 +22,7 @@ html {
 }
 
 body {
+  min-height: 100vh;
   margin: 0;
   background: var(--bg);
   color: var(--ink);
@@ -33,7 +35,7 @@ header {
 }
 
 h1 {
-  font: 600 30px/1.1 "Shippori Mincho", Georgia, serif;
+  font: 700 48px/1.05 "Caveat", cursive;
   margin: 0;
 }
 
@@ -45,6 +47,7 @@ header p {
 
 .app {
   display: grid;
+  grid-template-areas: "controls canvas";
   grid-template-columns: 300px minmax(0, 1fr);
   gap: 16px;
   padding: 16px 24px 24px;
@@ -54,6 +57,7 @@ header p {
 }
 
 aside {
+  grid-area: controls;
   min-width: 0;
   background: var(--panel);
   border: 1px solid var(--line);
@@ -123,8 +127,7 @@ h2 {
 }
 
 .card b {
-  display: block;
-  font-weight: 500;
+  display: none;
 }
 
 .card small {
@@ -169,6 +172,11 @@ button:focus-visible,
   border: 1px solid var(--line);
 }
 
+main {
+  grid-area: canvas;
+  min-width: 0;
+}
+
 .hint {
   color: var(--mut);
   margin: 8px 2px 0;
@@ -195,6 +203,9 @@ button:focus-visible,
 
 @media (max-width: 760px) {
   .app {
+    grid-template-areas:
+      "canvas"
+      "controls";
     grid-template-columns: minmax(0, 1fr);
     padding: 12px;
     width: 100%;

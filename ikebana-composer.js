@@ -257,20 +257,6 @@ document.querySelector('.tb').onclick = (event) => {
         items.splice(index, 1);
         selectedId = null;
       }
-      if (action === 'color') item.k++;
-      if (action === 'big') item.s = Math.min(2.2, item.s * 1.15);
-      if (action === 'small') item.s = Math.max(0.5, item.s / 1.15);
-      if (action === 'fwd' && index < items.length - 1) [items[index], items[index + 1]] = [items[index + 1], items[index]];
-      if (action === 'back' && index > 0) [items[index], items[index - 1]] = [items[index - 1], items[index]];
-      if (action === 'dup') {
-        const duplicate = JSON.parse(JSON.stringify(item));
-        duplicate.id = ++nextId;
-        ['b', 'c', 'p'].forEach((key) => {
-          duplicate[key][0] = clamp(duplicate[key][0] + 16, 5, 595);
-        });
-        items.push(duplicate);
-        selectedId = duplicate.id;
-      }
     }
   }
   draw();

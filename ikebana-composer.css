@@ -1,8 +1,8 @@
 :root {
-  --bg: #e8ebe8;
+  --bg: #FFFAF0;
   --panel: #f3f5f2;
-  --ink: #232625;
-  --mut: #6f7673;
+  --ink: #000;
+  --mut: #000;
   --line: #d3d8d4;
   --acc: #6b2a5c;
   --stage: #dfe4e1;
@@ -10,30 +10,6 @@
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #151817;
-    --panel: #1d2120;
-    --ink: #e9ede9;
-    --mut: #8f9893;
-    --line: #2f3532;
-    --acc: #d08bc0;
-    --stage: #252a28;
-    --plinth: #343b38;
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #151817;
-  --panel: #1d2120;
-  --ink: #e9ede9;
-  --mut: #8f9893;
-  --line: #2f3532;
-  --acc: #d08bc0;
-  --stage: #252a28;
-  --plinth: #343b38;
 }
 
 html {
@@ -48,15 +24,16 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font: 14px/1.45 -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font: 15px/1.45 -apple-system, "Helvetica Neue", Arial, sans-serif;
 }
 
 header {
   padding: 20px 24px 4px;
+  text-align: center;
 }
 
 h1 {
-  font: 600 28px/1.1 "Shippori Mincho", Georgia, serif;
+  font: 600 30px/1.1 "Shippori Mincho", Georgia, serif;
   margin: 0;
 }
 
@@ -84,7 +61,7 @@ aside {
 }
 
 h2 {
-  font: 600 15px "Shippori Mincho", Georgia, serif;
+  font: 600 16px "Shippori Mincho", Georgia, serif;
   margin: 0 0 8px;
 }
 
@@ -175,7 +152,7 @@ button:focus-visible,
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 #cv {
@@ -220,6 +197,7 @@ button:focus-visible,
 
   header {
     padding: 16px 12px 0;
+    text-align: center;
   }
 
   .grid {

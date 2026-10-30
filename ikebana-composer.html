@@ -24,22 +24,15 @@
       </aside>
 
       <main>
-        <div class="tb">
-          <button data-a="undo">Undo</button>
-          <button data-a="color">Change color</button>
-          <button data-a="big">Larger</button>
-          <button data-a="small">Smaller</button>
-          <button data-a="fwd">Bring forward</button>
-          <button data-a="back">Send back</button>
-          <button data-a="dup">Duplicate</button>
-          <button data-a="del">Remove</button>
-          <button data-a="clear">Clear all</button>
-        </div>
-
         <svg id="cv" viewBox="0 0 600 700" role="img" aria-label="Arrangement canvas">
           <rect width="600" height="700" style="fill: var(--stage)"></rect>
           <g id="lay"></g>
         </svg>
+        <div class="tb">
+          <button data-a="undo">Undo</button>
+          <button data-a="clear">Clear all</button>
+          <button data-a="del">Remove</button>
+        </div>
         <p class="hint">Drag a stem onto the canvas, or tap it to add. Drag a flower to aim it, and drag the filled dot to bend the stem.</p>
       </main>
     </div>

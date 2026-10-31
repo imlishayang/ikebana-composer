@@ -70,7 +70,7 @@ aside {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 10px;
-  
+  padding:25px;
   align-self: start;
 }
 
@@ -85,6 +85,7 @@ h2 {
     padding-top: 100px;
     padding-bottom: 50px;
 }
+
 
 .vs {
   display: flex;

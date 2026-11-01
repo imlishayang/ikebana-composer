@@ -18,11 +18,11 @@ const leaf = (start, control, end, position, side, scale, color) => {
 
 const flowers = {
   ranunculus: {
-    n: 'Ranunculus', r: 'Focal', p: ['#f08a2e', '#f1e9a8', '#e8d6e8', '#c7364f'], st: '#6f9a52', w: 3.5,
+    n: 'Ranunculus', r: 'Focal', p: ['#f08a2e', '#f1e9a8', '#e8d6e8', '#c7364f'], st: '#6f9a52', w: 4.5, headRadius: 47,
     h: (color) => `<g transform="translate(0,-22)"><circle r="25" fill="${color}"/>${[19, 14, 9, 5].map((radius) => `<circle r="${radius}" fill="${color}" stroke="#0003" stroke-width="1.3"/>`).join('')}</g>`,
   },
   allium: {
-    n: 'Allium', r: 'Focal', p: ['#b49be0', '#e0a7c9', '#efece4', '#8f6bc9'], st: '#7ca05a', w: 3,
+    n: 'Allium', r: 'Focal', p: ['#b49be0', '#e0a7c9', '#efece4', '#8f6bc9'], st: '#7ca05a', w: 4, headRadius: 54,
     h: (color) => [...Array(64)].map((_, index) => {
       const radius = Math.sqrt((index + 0.5) / 64) * 27;
       const angle = index * 2.39996;
@@ -30,12 +30,12 @@ const flowers = {
     }).join(''),
   },
   anthurium: {
-    n: 'Anthurium', r: 'Focal', p: ['#d9531e', '#c2263a', '#f3ede0', '#e58aa3'], st: '#6f9a52', w: 3.5,
+    n: 'Anthurium', r: 'Focal', p: ['#d9531e', '#c2263a', '#f3ede0', '#e58aa3'], st: '#6f9a52', w: 4.5, headRadius: 60,
     h: (color) => `<path d="M0 2C-36-6-40-46-5-58Q0-60 5-58C40-46 36-6 0 2Z" fill="${color}" stroke="#0003"/><path d="M0-8Q5-26 10-42" stroke="#e8e39a" stroke-width="5" stroke-linecap="round" fill="none"/>`,
   },
-  amaranthus: { n: 'Amaranthus', r: 'Trailing', p: ['#a3205a', '#7a2a6e', '#b8c16a', '#d9674a'], beads: 1 },
+  amaranthus: { n: 'Amaranthus', r: 'Trailing', p: ['#a3205a', '#7a2a6e', '#b8c16a', '#d9674a'], beads: 1, headRadius: 12 },
   hawthorn: {
-    n: 'Hawthorn', r: 'Branch', p: ['#e98fb0', '#f2c4d0', '#f6efe9', '#d9a5d8'], st: '#7a5a45', w: 2.5,
+    n: 'Hawthorn', r: 'Branch', p: ['#e98fb0', '#f2c4d0', '#f6efe9', '#d9a5d8'], st: '#7a5a45', w: 3.5, headRadius: 20,
     x: (start, control, end, color, scale) => [0.2, 0.38, 0.52]
       .map((position, index) => leaf(start, control, end, position, index % 2 ? 1 : -1, scale * 0.8, '#7ba45a')).join('')
       + [0.45, 0.58, 0.7, 0.82, 0.93, 1].map((position) => {
@@ -44,32 +44,44 @@ const flowers = {
       }).join(''),
   },
   vine: {
-    n: 'Pea vine', r: 'Line', p: ['#7ba45a', '#5f8f4c', '#9bb56a'], st: '#6a9a4a', w: 2,
+    n: 'Pea vine', r: 'Line', p: ['#7ba45a', '#5f8f4c', '#9bb56a'], st: '#6a9a4a', w: 3, headRadius: 20,
     x: (start, control, end, color, scale) => [0.2, 0.35, 0.5, 0.65, 0.8, 0.95]
       .map((position, index) => leaf(start, control, end, position, index % 2 ? 1 : -1, scale * 0.9, color)).join(''),
   },
   scape: {
-    n: 'Garlic scape', r: 'Line', p: ['#cfd88a', '#e9e4c2', '#b6c870'], st: '#7fa650', w: 3,
+    n: 'Garlic scape', r: 'Line', p: ['#cfd88a', '#e9e4c2', '#b6c870'], st: '#7fa650', w: 4, headRadius: 24,
     h: (color) => `<ellipse cy="-12" rx="5.5" ry="13" fill="${color}"/><path d="M0 0L0-24" stroke="#0002" fill="none"/>`,
   },
 };
 
 const vessels = [
   {
-    n: 'Wide bowl', mw: 110, my: 560, bottom: 660, openingY: 561, openingRx: 128, c: '#d8b998',
+    n: 'Basin', mw: 110, my: 560, bottom: 660, openingY: 561, openingRx: 128, c: '#d8b998',
+    icon: 'M160 560Q175 625 255 645H345Q425 625 440 560Z M255 645H345L335 660H265Z',
     d: (color) => `<path d="M160 560Q175 625 255 645H345Q425 625 440 560Z" fill="${color}"/><path d="M255 645H345L335 660H265Z" fill="${color}"/><ellipse cx="300" cy="560" rx="140" ry="10" fill="${color}"/><ellipse cx="300" cy="561" rx="128" ry="6" fill="#0004"/>`,
   },
   {
-    n: 'Tall cylinder', mw: 32, my: 560, bottom: 660, openingY: 561, openingRx: 38, c: '#8fa88e',
+    n: 'Column', mw: 32, my: 560, bottom: 660, openingY: 561, openingRx: 38, c: '#8fa88e',
+    icon: 'M255 560H345V660H255Z',
     d: (color) => `<rect x="255" y="560" width="90" height="100" rx="8" fill="${color}"/><rect x="255" y="560" width="24" height="100" fill="#fff" opacity=".14"/><ellipse cx="300" cy="560" rx="45" ry="7" fill="${color}"/><ellipse cx="300" cy="561" rx="38" ry="4" fill="#0004"/>`,
   },
   {
-    n: 'Low dish', mw: 120, my: 605, bottom: 655, openingY: 606, openingRx: 148, c: '#b9856a',
+    n: 'Plate', mw: 120, my: 605, bottom: 655, openingY: 606, openingRx: 148, c: '#b9856a',
+    icon: 'M140 605Q150 645 220 655H380Q450 645 460 605Z',
     d: (color) => `<path d="M140 605Q150 645 220 655H380Q450 645 460 605Z" fill="${color}"/><ellipse cx="300" cy="605" rx="160" ry="9" fill="${color}"/><ellipse cx="300" cy="606" rx="148" ry="5" fill="#0004"/>`,
   },
 ];
 
 const VESSEL_SCALE = 1.3;
+const HEAD_SAFE_AREA = 24;
+
+const clampFlowerTip = (type, x, y) => {
+  const radius = flowers[type].headRadius;
+  return [
+    clamp(x, HEAD_SAFE_AREA + radius, 600 - HEAD_SAFE_AREA - radius),
+    clamp(y, HEAD_SAFE_AREA + radius, 640 - HEAD_SAFE_AREA - radius),
+  ];
+};
 
 const baseForVessel = (vessel, x) => {
   const maxOffset = vessel.openingRx * 0.55 * VESSEL_SCALE;
@@ -130,7 +142,9 @@ function draw() {
   const handleRadius = 22 / Math.max(screenScale, 0.01);
   const labelScale = 1 / Math.max(screenScale, 0.01);
   const vesselTransform = `translate(300 ${vessel.bottom}) scale(${VESSEL_SCALE}) translate(-300 ${-vessel.bottom})`;
-  $('#lay').innerHTML = `<g transform="${vesselTransform}">${vessel.d(vessel.c)}</g>`
+  $('#lay').innerHTML = '<rect x="0" y="657" width="600" height="43" fill="#d5c9b9"/>'
+    + `<ellipse cx="300" cy="${vessel.bottom + 2}" rx="${vessel.openingRx * VESSEL_SCALE}" ry="6" fill="#514940" opacity=".16" filter="url(#contact-shadow)"/>`
+    + `<g transform="${vesselTransform}">${vessel.d(vessel.c)}</g>`
     + items.map(renderItem).join('')
     + (item
       ? `<path class="gl" d="M${item.b}L${item.c}L${item.p}"/>`
@@ -150,11 +164,11 @@ function draw() {
 function addItem(type, x, y, animate = true) {
   snapshot();
   const base = baseForVessel(vessels[vesselIndex], x);
-  const tip = [clamp(x, 10, 590), clamp(y, 20, 640)];
+  const tip = clampFlowerTip(type, x, y);
   const dx = tip[0] - base[0];
   const dy = tip[1] - base[1];
   const length = Math.hypot(dx, dy) || 1;
-  const bend = (Math.random() < 0.5 ? -1 : 1) * length * 0.2;
+  const bend = (Math.random() < 0.5 ? -1 : 1) * length * 0.15;
 
   items.push({
     id: ++nextId,
@@ -232,7 +246,7 @@ svg.onpointermove = (event) => {
     moved = 1;
   }
   const [x, y] = pointerPosition(event);
-  if (dragMode === 'p') item.p = [clamp(x, 10, 590), clamp(y, 20, 640)];
+  if (dragMode === 'p') item.p = clampFlowerTip(item.t, x, y);
   else item.c = [x, y];
   draw();
 };
@@ -254,7 +268,7 @@ svg.ondrop = (event) => {
   }
 };
 
-$('#vs').innerHTML = vessels.map((vessel, index) => `<button data-v="${index}"><i style="background:${vessel.c}"></i>${vessel.n}</button>`).join('');
+$('#vs').innerHTML = vessels.map((vessel, index) => `<button data-v="${index}"><svg viewBox="120 545 360 125" aria-hidden="true"><path d="${vessel.icon}"/></svg><span>${vessel.n}</span></button>`).join('');
 $('#vs').onclick = (event) => {
   const button = event.target.closest('[data-v]');
   if (!button) return;

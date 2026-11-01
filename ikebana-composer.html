@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Ikebana Composer</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&display=swap">
-    <link rel="stylesheet" href="ikebana-composer.css?v=5">
+    <link rel="stylesheet" href="ikebana-composer.css?v=6">
     <script src="ikebana-composer.js" defer></script>
   </head>
   <body>
@@ -28,6 +28,11 @@
 
       <main>
         <svg id="cv" viewBox="0 0 600 700" role="img" tabindex="0" aria-label="Arrangement canvas. Arrow keys move the selected stem; Shift and arrow keys bend it.">
+          <defs>
+            <filter id="contact-shadow" x="-30%" y="-100%" width="160%" height="300%">
+              <feGaussianBlur stdDeviation="5"></feGaussianBlur>
+            </filter>
+          </defs>
           <g id="lay"></g>
         </svg>
         <div class="tb">
@@ -39,7 +44,7 @@
             <button type="button" data-a="confirm-clear">Yes</button>
             <button type="button" data-a="cancel-clear">Cancel</button>
           </span>
-            <button id="save-image" type="button">Save image</button>
+          <button id="save-image" type="button">Save image</button>
         </div>
         <p class="hint">Drag to place, aim, or bend.</p>
       </main>

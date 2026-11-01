@@ -160,13 +160,25 @@ button {
 }
 
 button:disabled {
-  opacity: 0.4;
-  cursor: default;
+  opacity: 0.72;
+  color: #000;
+  background: #e5e3dd;
+  border-color: #8a8882;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background: #e5e3dd;
+  border-color: #8a8882;
+  box-shadow: none;
+  filter: none;
+  transform: none;
 }
 
 button:focus-visible,
-.card:focus-visible {
-  outline: 2px solid var(--acc);
+.card:focus-visible,
+#cv:focus-visible {
+  outline: 3px solid var(--acc);
   outline-offset: 2px;
 }
 
@@ -177,6 +189,27 @@ button:focus-visible,
   margin-top: 10px;
 }
 
+.tb #clear-all {
+  background: transparent;
+  border-color: var(--ink);
+}
+
+.clear-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.clear-confirm[hidden] {
+  display: none;
+}
+
+.clear-confirm button {
+  padding: 4px 8px;
+}
+
 #cv {
   width: 100%;
   height: auto;
@@ -184,7 +217,7 @@ button:focus-visible,
   display: block;
   border-radius: 10px;
   overflow: hidden;
-  background: linear-gradient(to bottom, transparent calc(100% - 60px), var(--plinth) 0), var(--stage);
+  background: linear-gradient(to bottom, transparent calc(100% - 18px), var(--plinth) calc(100% - 18px), var(--plinth) 100%), var(--stage);
   touch-action: none;
   border: 1px solid var(--line);
 }
@@ -197,6 +230,28 @@ main {
 .hint {
   color: var(--mut);
   margin: 8px 2px 0;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.empty-hint {
+  fill: #4f5c53;
+  font: 500 16px/1 -apple-system, "Helvetica Neue", Arial, sans-serif;
+  pointer-events: none;
+}
+
+.stem.is-selected {
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 3px #8f796f);
+}
+
+.handle-control {
+  cursor: grab;
+}
+
+.handle-target {
+  fill: transparent;
+  cursor: grab;
+  touch-action: none;
 }
 
 .hd {
@@ -204,11 +259,41 @@ main {
   stroke: var(--acc);
   stroke-width: 2.5;
   cursor: grab;
+  transition: r 100ms ease, filter 100ms ease;
 }
 
 .hc {
   fill: var(--acc);
   cursor: grab;
+  transition: r 100ms ease, filter 100ms ease;
+}
+
+.handle-control:hover .hd,
+.is-dragging .aim-control .hd {
+  filter: drop-shadow(0 0 3px #fff);
+  r: 12px;
+}
+
+.handle-control:hover .hc,
+.is-dragging .bend-control .hc {
+  filter: drop-shadow(0 0 3px #fff);
+  r: 10px;
+}
+
+.handle-label {
+  pointer-events: none;
+}
+
+.handle-label rect {
+  fill: #fffaf0;
+  stroke: #8f796f;
+  stroke-width: 1;
+}
+
+.handle-label text {
+  fill: #352e2a;
+  font: 600 12px/1 -apple-system, "Helvetica Neue", Arial, sans-serif;
+  text-anchor: middle;
 }
 
 .gl {
@@ -218,7 +303,7 @@ main {
   opacity: 0.7;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767px) {
   .app {
     grid-template-areas:
       "canvas"
@@ -232,6 +317,25 @@ main {
     min-width: 0;
   }
 
+  aside {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 16px;
+  }
+
+  .picker-group {
+    flex: 0 0 max-content;
+  }
+
+  .picker-group h2 {
+    margin-bottom: 6px;
+    padding: 0 0 6px;
+  }
+
   header {
     padding: 20px 12px;
     text-align: center;
@@ -239,9 +343,7 @@ main {
 
   .grid {
     display: flex;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    overscroll-behavior-x: contain;
+    gap: 8px;
   }
 
   .card {
@@ -250,6 +352,7 @@ main {
 
   .vs button {
     min-height: 44px;
+    white-space: nowrap;
   }
 
   .tb button {

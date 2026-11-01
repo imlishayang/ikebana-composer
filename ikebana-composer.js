@@ -83,7 +83,8 @@ function renderItem(item) {
   const { b: start, c: control, p: end, s: scale } = item;
   const color = flower.p[item.k % flower.p.length];
   const path = `M${start} Q${control} ${end}`;
-  let markup = `<g data-id="${item.id}"><path d="${path}" stroke="transparent" stroke-width="24" fill="none"/>`;
+  const classes = ['stem', item.id === selectedId && 'is-selected', item.id === justPlacedId && 'just-placed'].filter(Boolean).join(' ');
+  let markup = `<g class="${classes}" style="--stem-base-x:${start[0]}px;--stem-base-y:${start[1]}px" data-id="${item.id}"><path d="${path}" stroke="transparent" stroke-width="24" fill="none"/>`;
 
   if (flower.beads) {
     markup += `<path d="${path}" stroke="${color}" stroke-width="${9 * scale}" stroke-dasharray="0 ${7 * scale}" stroke-linecap="round" fill="none"/><path d="${path}" stroke="${color}" stroke-width="1.6" opacity=".7" fill="none"/>`;
@@ -105,6 +106,7 @@ let nextId = 0;
 let history = [];
 let dragMode = null;
 let moved = 0;
+let justPlacedId = null;
 
 const currentItem = () => items.find((item) => item.id === selectedId);
 const svg = $('#cv');
@@ -123,22 +125,30 @@ const save = () => {
 function draw() {
   const vessel = vessels[vesselIndex];
   const item = currentItem();
+  const matrix = svg.getScreenCTM();
+  const screenScale = matrix ? Math.min(Math.hypot(matrix.a, matrix.b), Math.hypot(matrix.c, matrix.d)) : 1;
+  const handleRadius = 22 / Math.max(screenScale, 0.01);
+  const labelScale = 1 / Math.max(screenScale, 0.01);
   const vesselTransform = `translate(300 ${vessel.bottom}) scale(${VESSEL_SCALE}) translate(-300 ${-vessel.bottom})`;
   $('#lay').innerHTML = `<ellipse cx="300" cy="${vessel.bottom + 2}" rx="${vessel.shadowRx * 1.3}" ry="6" fill="#514940" opacity=".28" filter="url(#contact-shadow)"/>`
     + `<g transform="${vesselTransform}">${vessel.d(vessel.c)}</g>`
     + items.map(renderItem).join('')
-    + (item ? `<path class="gl" d="M${item.b}L${item.c}L${item.p}"/><circle class="hc" data-h="c" cx="${item.c[0]}" cy="${item.c[1]}" r="8"/><circle class="hd" data-h="p" cx="${item.p[0]}" cy="${item.p[1]}" r="10"/>` : '');
+    + (item
+      ? `<path class="gl" d="M${item.b}L${item.c}L${item.p}"/>`
+        + `<g class="handle-control bend-control"><circle class="handle-target" data-h="c" cx="${item.c[0]}" cy="${item.c[1]}" r="${handleRadius}" aria-label="Bend stem"/><circle class="hc" data-h="c" cx="${item.c[0]}" cy="${item.c[1]}" r="8"/><g class="handle-label" transform="translate(${item.c[0]} ${item.c[1]}) scale(${labelScale})"><rect x="14" y="14" width="42" height="20" rx="4"/><text x="35" y="28">Bend</text></g></g>`
+        + `<g class="handle-control aim-control"><circle class="handle-target" data-h="p" cx="${item.p[0]}" cy="${item.p[1]}" r="${handleRadius}" aria-label="Aim flower"/><circle class="hd" data-h="p" cx="${item.p[0]}" cy="${item.p[1]}" r="10"/><g class="handle-label" transform="translate(${item.p[0]} ${item.p[1]}) scale(${labelScale})"><rect x="14" y="-36" width="36" height="20" rx="4"/><text x="32" y="-22">Aim</text></g></g>`
+      : items.length === 0 ? '<text class="empty-hint" x="300" y="350" text-anchor="middle">Tap a stem to begin</text>' : '');
 
   document.querySelectorAll('[data-a]').forEach((button) => {
     const action = button.dataset.a;
-    button.disabled = action === 'undo' ? !history.length : action === 'clear' ? !items.length : !item;
+    button.disabled = action === 'undo' ? !history.length : action === 'del' && !item;
   });
   document.querySelectorAll('#vs button').forEach((button, index) => {
     button.classList.toggle('on', index === vesselIndex);
   });
 }
 
-function addItem(type, x, y) {
+function addItem(type, x, y, animate = true) {
   snapshot();
   const base = baseForVessel(vessels[vesselIndex], x);
   const tip = [clamp(x, 10, 590), clamp(y, 20, 640)];
@@ -157,8 +167,18 @@ function addItem(type, x, y) {
     k: 0,
   });
   selectedId = nextId;
+  const addedId = nextId;
+  justPlacedId = !animate || matchMedia('(prefers-reduced-motion: reduce)').matches ? null : addedId;
   draw();
   save();
+  if (justPlacedId === addedId) {
+    window.setTimeout(() => {
+      if (justPlacedId === addedId) {
+        justPlacedId = null;
+        draw();
+      }
+    }, 320);
+  }
 }
 
 const pointerPosition = (event) => {
@@ -176,8 +196,33 @@ svg.onpointerdown = (event) => {
   } else selectedId = null;
 
   if (dragMode) svg.setPointerCapture(event.pointerId);
+  svg.focus({ preventScroll: true });
+  svg.classList.toggle('is-dragging', Boolean(dragMode));
   moved = 0;
   draw();
+};
+
+svg.onkeydown = (event) => {
+  const delta = {
+    ArrowUp: [0, -5],
+    ArrowDown: [0, 5],
+    ArrowLeft: [-5, 0],
+    ArrowRight: [5, 0],
+  }[event.key];
+  const item = currentItem();
+  if (!delta || !item) return;
+
+  event.preventDefault();
+  snapshot();
+  const move = ([x, y]) => [clamp(x + delta[0], 0, 600), clamp(y + delta[1], 0, 700)];
+  if (event.shiftKey) item.c = move(item.c);
+  else {
+    item.b = move(item.b);
+    item.c = move(item.c);
+    item.p = move(item.p);
+  }
+  draw();
+  save();
 };
 
 svg.onpointermove = (event) => {
@@ -196,6 +241,7 @@ svg.onpointermove = (event) => {
 svg.onpointerup = svg.onpointercancel = () => {
   if (dragMode && moved) save();
   dragMode = null;
+  svg.classList.remove('is-dragging');
   moved = 0;
 };
 
@@ -231,7 +277,11 @@ library.ondragstart = (event) => {
   if (card) event.dataTransfer.setData('text/plain', card.dataset.t);
 };
 
-const addRandomItem = (card) => card && addItem(card.dataset.t, 300 + (Math.random() - 0.5) * 280, 170 + Math.random() * 200);
+const addRandomItem = (card) => {
+  if (!card) return;
+  addItem(card.dataset.t, 300 + (Math.random() - 0.5) * 280, 170 + Math.random() * 200);
+  svg.focus({ preventScroll: true });
+};
 library.onclick = (event) => addRandomItem(event.target.closest('[data-t]'));
 library.onkeydown = (event) => {
   if (event.key === 'Enter' || event.key === ' ') {
@@ -241,9 +291,30 @@ library.onkeydown = (event) => {
 };
 
 document.querySelector('.tb').onclick = (event) => {
-  const action = event.target.dataset.a;
-  const item = currentItem();
+  let action = event.target.closest('[data-a]')?.dataset.a;
   if (!action) return;
+
+  const clearButton = $('#clear-all');
+  const clearPrompt = $('#clear-confirm');
+  if (action === 'clear') {
+    clearPrompt.hidden = false;
+    clearButton.setAttribute('aria-expanded', 'true');
+    clearPrompt.querySelector('[data-a="confirm-clear"]').focus();
+    return;
+  }
+  if (action === 'cancel-clear') {
+    clearPrompt.hidden = true;
+    clearButton.setAttribute('aria-expanded', 'false');
+    clearButton.focus();
+    return;
+  }
+  if (action === 'confirm-clear') {
+    action = 'clear';
+    clearPrompt.hidden = true;
+    clearButton.setAttribute('aria-expanded', 'false');
+  }
+
+  const item = currentItem();
 
   if (action === 'undo') {
     const previous = history.pop();
@@ -269,7 +340,70 @@ document.querySelector('.tb').onclick = (event) => {
   }
   draw();
   save();
+  if (action === 'clear') clearButton.focus();
 };
+
+async function exportCanvasAsPng() {
+  const clone = svg.cloneNode(true);
+  const namespace = 'http://www.w3.org/2000/svg';
+  clone.setAttribute('xmlns', namespace);
+  clone.setAttribute('width', '1200');
+  clone.setAttribute('height', '1400');
+
+  const style = document.createElementNS(namespace, 'style');
+  style.textContent = `
+    #lay .stem.is-selected { filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 3px #8f796f); }
+    #lay .gl { stroke: #6b2a5c; stroke-dasharray: 3 4; fill: none; opacity: .7; }
+    #lay .hd { fill: #fff; stroke: #6b2a5c; stroke-width: 2.5; }
+    #lay .hc { fill: #6b2a5c; }
+    #lay .handle-label { pointer-events: none; }
+    #lay .handle-label rect { fill: #fffaf0; stroke: #8f796f; stroke-width: 1; }
+    #lay .handle-label text { fill: #352e2a; font: 600 12px Arial, sans-serif; text-anchor: middle; }
+    #lay .empty-hint { fill: #4f5c53; font: 500 16px Arial, sans-serif; }
+  `;
+  const layer = clone.querySelector('#lay');
+  const stage = document.createElementNS(namespace, 'rect');
+  stage.setAttribute('width', '600');
+  stage.setAttribute('height', '700');
+  stage.setAttribute('fill', '#dfe4e1');
+  const tabletop = document.createElementNS(namespace, 'rect');
+  tabletop.setAttribute('x', '0');
+  tabletop.setAttribute('y', '657');
+  tabletop.setAttribute('width', '600');
+  tabletop.setAttribute('height', '43');
+  tabletop.setAttribute('fill', '#c9c2b7');
+  clone.insertBefore(style, layer);
+  clone.insertBefore(stage, layer);
+  clone.insertBefore(tabletop, layer);
+
+  const svgUrl = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml;charset=utf-8' }));
+  try {
+    const image = new Image();
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+      image.src = svgUrl;
+    });
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 1400;
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    const png = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (!png) throw new Error('PNG export failed');
+    const pngUrl = URL.createObjectURL(png);
+    const link = document.createElement('a');
+    link.href = pngUrl;
+    link.download = 'ikebana-arrangement.png';
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+  } finally {
+    URL.revokeObjectURL(svgUrl);
+  }
+}
+
+$('#save-image').addEventListener('click', () => {
+  exportCanvasAsPng().catch(() => window.alert('Unable to save the image.'));
+});
 
 try {
   const saved = JSON.parse(localStorage.getItem('ikebana-v1') || 'null');
@@ -281,7 +415,7 @@ try {
 } catch (error) {}
 
 if (!items.length) {
-  [['ranunculus', 428, 150], ['allium', 330, 250], ['hawthorn', 130, 215]].forEach(([type, x, y]) => addItem(type, x, y));
+  [['ranunculus', 428, 150], ['allium', 330, 250], ['hawthorn', 130, 215]].forEach(([type, x, y]) => addItem(type, x, y, false));
   history = [];
   selectedId = null;
 }

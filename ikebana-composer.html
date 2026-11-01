@@ -16,29 +16,37 @@
 
     <div class="app">
       <aside>
-        <h2>Vessel</h2>
-        <div class="vs" id="vs"></div>
-
-        <h2>Stems</h2>
-        <div class="grid" id="lib"></div>
+        <section class="picker-group" aria-labelledby="vessel-heading">
+          <h2 id="vessel-heading">Vessel</h2>
+          <div class="vs" id="vs"></div>
+        </section>
+        <section class="picker-group" aria-labelledby="stem-heading">
+          <h2 id="stem-heading">Stems</h2>
+          <div class="grid" id="lib"></div>
+        </section>
       </aside>
 
       <main>
-        <svg id="cv" viewBox="0 0 600 700" role="img" aria-label="Arrangement canvas">
+        <svg id="cv" viewBox="0 0 600 700" role="img" tabindex="0" aria-label="Arrangement canvas. Arrow keys move the selected stem; Shift and arrow keys bend it.">
           <defs>
             <filter id="contact-shadow" x="-30%" y="-100%" width="160%" height="300%">
               <feGaussianBlur stdDeviation="4"></feGaussianBlur>
             </filter>
           </defs>
-          <rect width="600" height="700" style="fill: var(--stage)"></rect>
           <g id="lay"></g>
         </svg>
         <div class="tb">
           <button data-a="undo">Undo</button>
-          <button data-a="clear">Clear all</button>
-          <button data-a="del">Remove</button>
+          <button id="clear-all" data-a="clear" aria-controls="clear-confirm" aria-expanded="false">Clear all</button>
+          <button data-a="del">Remove stem</button>
+          <span id="clear-confirm" class="clear-confirm" role="group" aria-label="Confirm clearing all stems" hidden>
+            <span>Clear everything?</span>
+            <button type="button" data-a="confirm-clear">Yes</button>
+            <button type="button" data-a="cancel-clear">Cancel</button>
+          </span>
+            <button id="save-image" type="button">Save image</button>
         </div>
-        <p class="hint">Drag a stem onto the canvas, or tap it to add. Drag a flower to aim it, and drag the filled dot to bend the stem.</p>
+        <p class="hint">Drag to place, aim, or bend.</p>
       </main>
     </div>
   </body>

@@ -14,7 +14,6 @@
   --line: #d3d8d4;
   --acc: #9a4f36;
   --stage: #dfe4e1;
-  --tabletop: #d5c9b9;
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -71,6 +70,10 @@ aside {
   border-radius: 10px;
   padding:25px;
   align-self: start;
+}
+
+.picker-group {
+  background: var(--panel);
 }
 
 h2 {
@@ -187,7 +190,7 @@ button:disabled {
 }
 
 button:disabled:hover {
-  background: #e5e3dd;
+  background: transparent;
   border-color: #8a8882;
   box-shadow: none;
   filter: none;
@@ -212,8 +215,10 @@ button:focus-visible,
   background: none;
   border-color: transparent;
   padding-inline: 5px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+}
+
+.tb #clear-all:hover {
+  color: var(--acc);
 }
 
 .tb > button[data-a="undo"],
@@ -228,24 +233,44 @@ button:focus-visible,
   border-color: var(--acc);
 }
 
-.clear-confirm button {
-  background: transparent;
-  border-color: #726a62;
-}
-
-.clear-confirm {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  white-space: nowrap;
+.clear-wrap {
+  position: relative;
 }
 
 .clear-confirm[hidden] {
   display: none;
 }
 
+.clear-confirm {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  bottom: calc(100% + 9px);
+  display: grid;
+  gap: 10px;
+  width: max-content;
+  min-width: 205px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: 0 6px 18px #0002;
+  font-size: 14px;
+}
+
+.clear-confirm p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.clear-confirm-actions {
+  display: flex;
+  gap: 6px;
+}
+
 .clear-confirm button {
+  background: transparent;
+  border-color: #726a62;
   padding: 4px 8px;
 }
 
@@ -424,4 +449,8 @@ main {
   .tb button {
     min-height: 44px;
   }
+}
+
+.vs button[data-v="1"] svg {
+  width: 24px;
 }

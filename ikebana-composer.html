@@ -37,13 +37,17 @@
         </svg>
         <div class="tb">
           <button data-a="undo">Undo</button>
-          <button id="clear-all" data-a="clear" aria-controls="clear-confirm" aria-expanded="false">Clear all</button>
           <button data-a="del">Remove stem</button>
-          <span id="clear-confirm" class="clear-confirm" role="group" aria-label="Confirm clearing all stems" hidden>
-            <span>Clear everything?</span>
-            <button type="button" data-a="confirm-clear">Yes</button>
-            <button type="button" data-a="cancel-clear">Cancel</button>
-          </span>
+          <div class="clear-wrap">
+            <button id="clear-all" data-a="clear" aria-controls="clear-confirm" aria-haspopup="dialog" aria-expanded="false">Clear all</button>
+            <div id="clear-confirm" class="clear-confirm" role="alertdialog" aria-labelledby="clear-confirm-title" hidden>
+              <p id="clear-confirm-title">Clear everything?</p>
+              <div class="clear-confirm-actions">
+                <button type="button" data-a="confirm-clear">Yes</button>
+                <button type="button" data-a="cancel-clear">Cancel</button>
+              </div>
+            </div>
+          </div>
           <button id="save-image" type="button">Save image</button>
         </div>
         <p class="hint">Drag to place, aim, or bend.</p>

@@ -33,7 +33,6 @@ const flowers = {
     n: 'Anthurium', r: 'Focal', p: ['#d9531e', '#c2263a', '#f3ede0', '#e58aa3'], st: '#6f9a52', w: 4.5, headRadius: 60,
     h: (color) => `<path d="M0 2C-36-6-40-46-5-58Q0-60 5-58C40-46 36-6 0 2Z" fill="${color}" stroke="#0003"/><path d="M0-8Q5-26 10-42" stroke="#e8e39a" stroke-width="5" stroke-linecap="round" fill="none"/>`,
   },
-  amaranthus: { n: 'Amaranthus', r: 'Trailing', p: ['#a3205a', '#7a2a6e', '#b8c16a', '#d9674a'], beads: 1, headRadius: 12 },
   hawthorn: {
     n: 'Hawthorn', r: 'Branch', p: ['#e98fb0', '#f2c4d0', '#f6efe9', '#d9a5d8'], st: '#7a5a45', w: 3.5, headRadius: 20,
     x: (start, control, end, color, scale) => [0.2, 0.38, 0.52]
@@ -56,17 +55,17 @@ const flowers = {
 
 const vessels = [
   {
-    n: 'Basin', mw: 110, my: 560, bottom: 660, openingY: 561, openingRx: 128, c: '#d8b998',
+    n: 'Basin', mw: 110, my: 560, bottom: 660, openingY: 561, openingRx: 128, shadowRx: 52, iconViewBox: '130 550 340 120', c: '#e7d0b4',
     icon: 'M160 560Q175 625 255 645H345Q425 625 440 560Z M255 645H345L335 660H265Z',
     d: (color) => `<path d="M160 560Q175 625 255 645H345Q425 625 440 560Z" fill="${color}"/><path d="M255 645H345L335 660H265Z" fill="${color}"/><ellipse cx="300" cy="560" rx="140" ry="10" fill="${color}"/><ellipse cx="300" cy="561" rx="128" ry="6" fill="#0004"/>`,
   },
   {
-    n: 'Column', mw: 32, my: 560, bottom: 660, openingY: 561, openingRx: 38, c: '#8fa88e',
+    n: 'Column', mw: 32, my: 560, bottom: 660, openingY: 561, openingRx: 38, shadowRx: 58, iconViewBox: '245 550 110 120', c: '#b1c2ae',
     icon: 'M255 560H345V660H255Z',
     d: (color) => `<rect x="255" y="560" width="90" height="100" rx="8" fill="${color}"/><rect x="255" y="560" width="24" height="100" fill="#fff" opacity=".14"/><ellipse cx="300" cy="560" rx="45" ry="7" fill="${color}"/><ellipse cx="300" cy="561" rx="38" ry="4" fill="#0004"/>`,
   },
   {
-    n: 'Plate', mw: 120, my: 605, bottom: 655, openingY: 606, openingRx: 148, c: '#b9856a',
+    n: 'Plate', mw: 120, my: 605, bottom: 655, openingY: 606, openingRx: 148, shadowRx: 104, iconViewBox: '130 590 340 80', c: '#d39e84',
     icon: 'M140 605Q150 645 220 655H380Q450 645 460 605Z',
     d: (color) => `<path d="M140 605Q150 645 220 655H380Q450 645 460 605Z" fill="${color}"/><ellipse cx="300" cy="605" rx="160" ry="9" fill="${color}"/><ellipse cx="300" cy="606" rx="148" ry="5" fill="#0004"/>`,
   },
@@ -77,9 +76,12 @@ const HEAD_SAFE_AREA = 24;
 
 const clampFlowerTip = (type, x, y) => {
   const radius = flowers[type].headRadius;
+  const matrix = svg.getScreenCTM();
+  const screenScale = matrix ? Math.min(Math.hypot(matrix.a, matrix.b), Math.hypot(matrix.c, matrix.d)) : 1;
+  const safeArea = HEAD_SAFE_AREA / Math.max(screenScale, 0.01);
   return [
-    clamp(x, HEAD_SAFE_AREA + radius, 600 - HEAD_SAFE_AREA - radius),
-    clamp(y, HEAD_SAFE_AREA + radius, 640 - HEAD_SAFE_AREA - radius),
+    clamp(x, safeArea + radius, 600 - safeArea - radius),
+    clamp(y, safeArea + radius, 640 - safeArea - radius),
   ];
 };
 
@@ -143,7 +145,7 @@ function draw() {
   const labelScale = 1 / Math.max(screenScale, 0.01);
   const vesselTransform = `translate(300 ${vessel.bottom}) scale(${VESSEL_SCALE}) translate(-300 ${-vessel.bottom})`;
   $('#lay').innerHTML = '<rect x="0" y="657" width="600" height="43" fill="#d5c9b9"/>'
-    + `<ellipse cx="300" cy="${vessel.bottom + 2}" rx="${vessel.openingRx * VESSEL_SCALE}" ry="6" fill="#514940" opacity=".16" filter="url(#contact-shadow)"/>`
+    + `<ellipse cx="300" cy="${vessel.bottom + 6}" rx="${vessel.shadowRx * VESSEL_SCALE}" ry="4" fill="#514940" opacity=".16" filter="url(#contact-shadow)"/>`
     + `<g transform="${vesselTransform}">${vessel.d(vessel.c)}</g>`
     + items.map(renderItem).join('')
     + (item
@@ -230,9 +232,11 @@ svg.onkeydown = (event) => {
   const move = ([x, y]) => [clamp(x + delta[0], 0, 600), clamp(y + delta[1], 0, 700)];
   if (event.shiftKey) item.c = move(item.c);
   else {
-    item.b = move(item.b);
-    item.c = move(item.c);
-    item.p = move(item.p);
+    const nextTip = clampFlowerTip(item.t, item.p[0] + delta[0], item.p[1] + delta[1]);
+    const offset = [nextTip[0] - item.p[0], nextTip[1] - item.p[1]];
+    item.b = [item.b[0] + offset[0], item.b[1] + offset[1]];
+    item.c = [item.c[0] + offset[0], item.c[1] + offset[1]];
+    item.p = nextTip;
   }
   draw();
   save();
@@ -268,7 +272,7 @@ svg.ondrop = (event) => {
   }
 };
 
-$('#vs').innerHTML = vessels.map((vessel, index) => `<button data-v="${index}"><svg viewBox="120 545 360 125" aria-hidden="true"><path d="${vessel.icon}"/></svg><span>${vessel.n}</span></button>`).join('');
+$('#vs').innerHTML = vessels.map((vessel, index) => `<button data-v="${index}"><svg viewBox="${vessel.iconViewBox}" aria-hidden="true"><path d="${vessel.icon}"/></svg><span>${vessel.n}</span></button>`).join('');
 $('#vs').onclick = (event) => {
   const button = event.target.closest('[data-v]');
   if (!button) return;
@@ -366,9 +370,9 @@ async function exportCanvasAsPng() {
   const style = document.createElementNS(namespace, 'style');
   style.textContent = `
     #lay .stem.is-selected { filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 3px #8f796f); }
-    #lay .gl { stroke: #6b2a5c; stroke-dasharray: 3 4; fill: none; opacity: .7; }
-    #lay .hd { fill: #fff; stroke: #6b2a5c; stroke-width: 2.5; }
-    #lay .hc { fill: #6b2a5c; }
+    #lay .gl { stroke: #9a4f36; stroke-dasharray: 3 4; fill: none; opacity: .7; }
+    #lay .hd { fill: #fff; stroke: #9a4f36; stroke-width: 2.5; }
+    #lay .hc { fill: #9a4f36; }
     #lay .handle-label { pointer-events: none; }
     #lay .handle-label rect { fill: #fffaf0; stroke: #8f796f; stroke-width: 1; }
     #lay .handle-label text { fill: #352e2a; font: 600 12px Arial, sans-serif; text-anchor: middle; }
@@ -384,7 +388,7 @@ async function exportCanvasAsPng() {
   tabletop.setAttribute('y', '657');
   tabletop.setAttribute('width', '600');
   tabletop.setAttribute('height', '43');
-  tabletop.setAttribute('fill', '#c9c2b7');
+  tabletop.setAttribute('fill', '#d5c9b9');
   clone.insertBefore(style, layer);
   clone.insertBefore(stage, layer);
   clone.insertBefore(tabletop, layer);
@@ -421,7 +425,7 @@ $('#save-image').addEventListener('click', () => {
 try {
   const saved = JSON.parse(localStorage.getItem('ikebana-v1') || 'null');
   if (saved && Array.isArray(saved.items)) {
-    items = saved.items;
+    items = saved.items.filter((item) => flowers[item.t]);
     vesselIndex = saved.vi || 0;
     nextId = saved.uid || 0;
   }

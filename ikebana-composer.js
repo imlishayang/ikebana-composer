@@ -56,15 +56,15 @@ const flowers = {
 
 const vessels = [
   {
-    n: 'Wide bowl', mw: 110, my: 560, bottom: 660, openingY: 561, openingRx: 128, shadowRx: 140, c: '#d8b998',
+    n: 'Wide bowl', mw: 110, my: 560, bottom: 660, openingY: 561, openingRx: 128, c: '#d8b998',
     d: (color) => `<path d="M160 560Q175 625 255 645H345Q425 625 440 560Z" fill="${color}"/><path d="M255 645H345L335 660H265Z" fill="${color}"/><ellipse cx="300" cy="560" rx="140" ry="10" fill="${color}"/><ellipse cx="300" cy="561" rx="128" ry="6" fill="#0004"/>`,
   },
   {
-    n: 'Tall cylinder', mw: 32, my: 560, bottom: 660, openingY: 561, openingRx: 38, shadowRx: 45, c: '#8fa88e',
+    n: 'Tall cylinder', mw: 32, my: 560, bottom: 660, openingY: 561, openingRx: 38, c: '#8fa88e',
     d: (color) => `<rect x="255" y="560" width="90" height="100" rx="8" fill="${color}"/><rect x="255" y="560" width="24" height="100" fill="#fff" opacity=".14"/><ellipse cx="300" cy="560" rx="45" ry="7" fill="${color}"/><ellipse cx="300" cy="561" rx="38" ry="4" fill="#0004"/>`,
   },
   {
-    n: 'Low dish', mw: 120, my: 605, bottom: 655, openingY: 606, openingRx: 148, shadowRx: 160, c: '#b9856a',
+    n: 'Low dish', mw: 120, my: 605, bottom: 655, openingY: 606, openingRx: 148, c: '#b9856a',
     d: (color) => `<path d="M140 605Q150 645 220 655H380Q450 645 460 605Z" fill="${color}"/><ellipse cx="300" cy="605" rx="160" ry="9" fill="${color}"/><ellipse cx="300" cy="606" rx="148" ry="5" fill="#0004"/>`,
   },
 ];
@@ -130,8 +130,7 @@ function draw() {
   const handleRadius = 22 / Math.max(screenScale, 0.01);
   const labelScale = 1 / Math.max(screenScale, 0.01);
   const vesselTransform = `translate(300 ${vessel.bottom}) scale(${VESSEL_SCALE}) translate(-300 ${-vessel.bottom})`;
-  $('#lay').innerHTML = `<ellipse cx="300" cy="${vessel.bottom + 2}" rx="${vessel.shadowRx * 1.3}" ry="6" fill="#514940" opacity=".28" filter="url(#contact-shadow)"/>`
-    + `<g transform="${vesselTransform}">${vessel.d(vessel.c)}</g>`
+  $('#lay').innerHTML = `<g transform="${vesselTransform}">${vessel.d(vessel.c)}</g>`
     + items.map(renderItem).join('')
     + (item
       ? `<path class="gl" d="M${item.b}L${item.c}L${item.p}"/>`
@@ -269,7 +268,7 @@ $('#vs').onclick = (event) => {
   save();
 };
 
-$('#lib').innerHTML = Object.keys(flowers).map((type) => `<div class="card" draggable="true" tabindex="0" data-t="${type}"><svg viewBox="-50 -100 100 125">${renderItem({ id: 0, t: type, b: [0, 18], c: [-12, -28], p: [6, -62], s: 0.7, k: 0 })}</svg><b>${flowers[type].n}</b><small>${flowers[type].r}</small></div>`).join('');
+$('#lib').innerHTML = Object.keys(flowers).map((type) => `<div class="card" role="button" aria-label="Add ${flowers[type].n}" draggable="true" tabindex="0" data-t="${type}"><svg viewBox="-50 -100 100 125">${renderItem({ id: 0, t: type, b: [0, 18], c: [-12, -28], p: [6, -62], s: 0.7, k: 0 })}</svg><b>${flowers[type].n}</b><small>${flowers[type].r}</small></div>`).join('');
 
 const library = $('#lib');
 library.ondragstart = (event) => {

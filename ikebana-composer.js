@@ -56,18 +56,27 @@ const flowers = {
 
 const vessels = [
   {
-    n: 'Wide bowl', mw: 110, my: 560, c: '#d8b998',
+    n: 'Wide bowl', mw: 110, my: 560, bottom: 660, openingY: 561, openingRx: 128, shadowRx: 140, c: '#d8b998',
     d: (color) => `<path d="M160 560Q175 625 255 645H345Q425 625 440 560Z" fill="${color}"/><path d="M255 645H345L335 660H265Z" fill="${color}"/><ellipse cx="300" cy="560" rx="140" ry="10" fill="${color}"/><ellipse cx="300" cy="561" rx="128" ry="6" fill="#0004"/>`,
   },
   {
-    n: 'Tall cylinder', mw: 32, my: 560, c: '#8fa88e',
+    n: 'Tall cylinder', mw: 32, my: 560, bottom: 660, openingY: 561, openingRx: 38, shadowRx: 45, c: '#8fa88e',
     d: (color) => `<rect x="255" y="560" width="90" height="100" rx="8" fill="${color}"/><rect x="255" y="560" width="24" height="100" fill="#fff" opacity=".14"/><ellipse cx="300" cy="560" rx="45" ry="7" fill="${color}"/><ellipse cx="300" cy="561" rx="38" ry="4" fill="#0004"/>`,
   },
   {
-    n: 'Low dish', mw: 120, my: 605, c: '#b9856a',
+    n: 'Low dish', mw: 120, my: 605, bottom: 655, openingY: 606, openingRx: 148, shadowRx: 160, c: '#b9856a',
     d: (color) => `<path d="M140 605Q150 645 220 655H380Q450 645 460 605Z" fill="${color}"/><ellipse cx="300" cy="605" rx="160" ry="9" fill="${color}"/><ellipse cx="300" cy="606" rx="148" ry="5" fill="#0004"/>`,
   },
 ];
+
+const VESSEL_SCALE = 1.3;
+
+const baseForVessel = (vessel, x) => {
+  const maxOffset = vessel.openingRx * 0.55 * VESSEL_SCALE;
+  const baseX = 300 + clamp((x - 300) * 0.25, -maxOffset, maxOffset);
+  const baseY = vessel.bottom + (vessel.openingY - vessel.bottom) * VESSEL_SCALE;
+  return [baseX, baseY];
+};
 
 function renderItem(item) {
   const flower = flowers[item.t];
@@ -114,8 +123,9 @@ const save = () => {
 function draw() {
   const vessel = vessels[vesselIndex];
   const item = currentItem();
-  $('#lay').innerHTML = `<rect x="90" y="660" width="420" height="24" rx="3" style="fill:var(--plinth)"/>`
-    + vessel.d(vessel.c)
+  const vesselTransform = `translate(300 ${vessel.bottom}) scale(${VESSEL_SCALE}) translate(-300 ${-vessel.bottom})`;
+  $('#lay').innerHTML = `<ellipse cx="300" cy="${vessel.bottom + 2}" rx="${vessel.shadowRx * 1.3}" ry="6" fill="#514940" opacity=".28" filter="url(#contact-shadow)"/>`
+    + `<g transform="${vesselTransform}">${vessel.d(vessel.c)}</g>`
     + items.map(renderItem).join('')
     + (item ? `<path class="gl" d="M${item.b}L${item.c}L${item.p}"/><circle class="hc" data-h="c" cx="${item.c[0]}" cy="${item.c[1]}" r="8"/><circle class="hd" data-h="p" cx="${item.p[0]}" cy="${item.p[1]}" r="10"/>` : '');
 
@@ -130,9 +140,7 @@ function draw() {
 
 function addItem(type, x, y) {
   snapshot();
-  const vessel = vessels[vesselIndex];
-  const baseX = 300 + clamp((x - 300) * 0.25, -vessel.mw, vessel.mw);
-  const base = [baseX, vessel.my + 4];
+  const base = baseForVessel(vessels[vesselIndex], x);
   const tip = [clamp(x, 10, 590), clamp(y, 20, 640)];
   const dx = tip[0] - base[0];
   const dy = tip[1] - base[1];
@@ -209,7 +217,7 @@ $('#vs').onclick = (event) => {
   vesselIndex = +button.dataset.v;
   const vessel = vessels[vesselIndex];
   items.forEach((item) => {
-    item.b = [300 + clamp(item.b[0] - 300, -vessel.mw, vessel.mw), vessel.my + 4];
+    item.b = baseForVessel(vessel, item.b[0]);
   });
   draw();
   save();

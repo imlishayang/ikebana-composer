@@ -14,7 +14,7 @@
   --line: #d3d8d4;
   --acc: #6b2a5c;
   --stage: #dfe4e1;
-  --plinth: #c4cbc6;
+  --plinth: #c9c2b7;
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -79,6 +79,8 @@ h2 {
   font-size: 16px;
   font-weight: 400;
   margin: 0 0 8px;
+  padding-top:5px;
+  padding-bottom:10px;
 }
 
 .ikebana {
@@ -181,6 +183,8 @@ button:focus-visible,
   max-height: 78vh;
   display: block;
   border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(to bottom, transparent calc(100% - 60px), var(--plinth) 0), var(--stage);
   touch-action: none;
   border: 1px solid var(--line);
 }

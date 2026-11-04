@@ -406,16 +406,15 @@ main {
 
   aside {
     display: flex;
-    align-items: flex-start;
-    gap: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
     max-width: 100%;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
     padding: 16px;
   }
 
   .picker-group {
-    flex: 0 0 max-content;
+    flex: 0 0 auto;
   }
 
   .picker-group h2 {
@@ -428,12 +427,17 @@ main {
     text-align: center;
   }
 
+  .ikebana {
+    padding-top: 24px;
+    padding-bottom: 12px;
+  }
+
   .card {
     min-width: 0;
   }
 
   #lib {
-    width: 252px;
+    width: 100%;
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 

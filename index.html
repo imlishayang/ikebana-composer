@@ -36,7 +36,12 @@
           <g id="lay"></g>
         </svg>
         <div class="tb">
-          <button data-a="undo">Undo</button>
+          <button class="history-button" data-a="undo" aria-label="Undo" title="Undo">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 7 7v2"></path></svg>
+          </button>
+          <button class="history-button" data-a="redo" aria-label="Redo" title="Redo">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5m5 5h-9a7 7 0 0 0-7 7v2"></path></svg>
+          </button>
           <button data-a="del">Remove stem</button>
           <div class="clear-wrap">
             <button id="clear-all" data-a="clear" aria-controls="clear-confirm" aria-haspopup="dialog" aria-expanded="false">Clear all</button>

@@ -118,6 +118,7 @@ let selectedId = null;
 let vesselIndex = 0;
 let nextId = 0;
 let history = [];
+let redoHistory = [];
 let dragMode = null;
 let moved = 0;
 let justPlacedId = null;
@@ -126,8 +127,9 @@ const currentItem = () => items.find((item) => item.id === selectedId);
 const svg = $('#cv');
 
 const snapshot = () => {
-  history.push(JSON.stringify({ items, vi: vesselIndex, uid: nextId }));
+  history.push(JSON.stringify({ items, vi: vesselIndex, uid: nextId, sid: selectedId }));
   if (history.length > 60) history.shift();
+  redoHistory = [];
 };
 
 const save = () => {
@@ -156,7 +158,9 @@ function draw() {
 
   document.querySelectorAll('[data-a]').forEach((button) => {
     const action = button.dataset.a;
-    button.disabled = action === 'undo' ? !history.length : action === 'del' && !item;
+    button.disabled = action === 'undo' ? !history.length
+      : action === 'redo' ? !redoHistory.length
+        : action === 'del' && !item;
   });
   document.querySelectorAll('#vs button').forEach((button, index) => {
     button.classList.toggle('on', index === vesselIndex);
@@ -334,13 +338,22 @@ document.querySelector('.tb').onclick = (event) => {
   const item = currentItem();
 
   if (action === 'undo') {
-    const previous = history.pop();
-    if (previous) {
-      const state = JSON.parse(previous);
+    if (history.length) {
+      redoHistory.push(JSON.stringify({ items, vi: vesselIndex, uid: nextId, sid: selectedId }));
+      const state = JSON.parse(history.pop());
       items = state.items;
       vesselIndex = state.vi;
       nextId = state.uid;
-      selectedId = null;
+      selectedId = state.sid ?? null;
+    }
+  } else if (action === 'redo') {
+    if (redoHistory.length) {
+      history.push(JSON.stringify({ items, vi: vesselIndex, uid: nextId, sid: selectedId }));
+      const state = JSON.parse(redoHistory.pop());
+      items = state.items;
+      vesselIndex = state.vi;
+      nextId = state.uid;
+      selectedId = state.sid ?? null;
     }
   } else {
     snapshot();
